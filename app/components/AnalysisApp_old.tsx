@@ -1110,7 +1110,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
     <div style={styles.page}>
       {/* Header */}
       <header style={styles.header}>
-        <div style={styles.headerContent} className="header-content">
+        <div style={styles.headerContent}>
           <div style={styles.logoSection}>
             <img src="/logo.png" alt="Bavella" style={styles.logo} />
             <div style={styles.logoText}>
@@ -1118,7 +1118,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
               <span style={styles.brandTagline}>Quantitative Analytics</span>
             </div>
           </div>
-          <nav style={styles.nav} className="nav">
+          <nav style={styles.nav}>
             <button
               onClick={() => setActiveTab('analysis')}
               style={activeTab === 'analysis' ? styles.navLinkActive : styles.navLink}
@@ -1196,9 +1196,9 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
           {activeTab === 'analysis' && (
             <>
               {/* Page Header with Portfolio Toolbar */}
-              <div style={{ ...styles.pageHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }} className="page-header">
+              <div style={{ ...styles.pageHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
                 <div>
-                  <h1 style={styles.pageTitle} className="page-title">Portfolio Analysis</h1>
+                  <h1 style={styles.pageTitle}>Portfolio Analysis</h1>
                   <p style={styles.pageSubtitle}>
                     Build and analyze long/short portfolios with AI-powered regime detection
                   </p>
@@ -1220,7 +1220,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                   <h2 style={styles.cardTitle}>Configuration</h2>
                 </div>
                 <div style={styles.cardBody}>
-                  <div style={styles.configGrid} className="config-grid">
+                  <div style={styles.configGrid}>
                     <div style={styles.formGroup}>
                       <label style={styles.label}>Portfolio Name</label>
                       <input
@@ -1251,26 +1251,26 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
               </div>
 
               {/* Exposure Summary */}
-              <div style={styles.exposureGrid} className="exposure-grid">
+              <div style={styles.exposureGrid}>
                 <div style={styles.exposureCard}>
                   <div style={styles.exposureLabel}>Long Exposure</div>
-                  <div style={{ ...styles.exposureValue, color: '#00b894' }} className="exposure-value">
+                  <div style={{ ...styles.exposureValue, color: '#00b894' }}>
                     {formatCurrency(longExposure)}
                   </div>
                 </div>
                 <div style={styles.exposureCard}>
                   <div style={styles.exposureLabel}>Short Exposure</div>
-                  <div style={{ ...styles.exposureValue, color: '#e74c3c' }} className="exposure-value">
+                  <div style={{ ...styles.exposureValue, color: '#e74c3c' }}>
                     {formatCurrency(shortExposure)}
                   </div>
                 </div>
                 <div style={styles.exposureCard}>
                   <div style={styles.exposureLabel}>Gross Exposure</div>
-                  <div style={styles.exposureValue} className="exposure-value">{formatCurrency(gross)}</div>
+                  <div style={styles.exposureValue}>{formatCurrency(gross)}</div>
                 </div>
                 <div style={styles.exposureCard}>
                   <div style={styles.exposureLabel}>Net Exposure</div>
-                  <div style={{ ...styles.exposureValue, color: net >= 0 ? '#00b894' : '#e74c3c' }} className="exposure-value">
+                  <div style={{ ...styles.exposureValue, color: net >= 0 ? '#00b894' : '#e74c3c' }}>
                     {formatCurrency(net)}
                   </div>
                 </div>
@@ -1290,7 +1290,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                 </div>
                 <div style={styles.cardBody}>
                   {/* Table Header */}
-                  <div style={styles.tableHeader} className="table-header">
+                  <div style={styles.tableHeader}>
                     <div style={styles.tableHeaderCell}>Instrument</div>
                     <div style={styles.tableHeaderCell}>Amount (USD)</div>
                     <div style={styles.tableHeaderCell}>Direction</div>
@@ -1300,7 +1300,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
 
                   {/* Table Rows */}
                   {rows.map((r) => (
-                    <div key={r.id} style={styles.tableRow} className="table-row">
+                    <div key={r.id} style={styles.tableRow}>
                       <div style={styles.tableCell}>
                         <input
                           value={r.query}
@@ -1502,7 +1502,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
 
       {/* Footer */}
       <footer style={styles.footer}>
-        <div style={styles.footerContent} className="footer-content">
+        <div style={styles.footerContent}>
           <div style={styles.footerBrand}>
             <span style={styles.footerLogo}>BAVELLA</span>
             <span style={styles.footerTagline}>Quantitative Analytics</span>

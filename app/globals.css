@@ -24,3 +24,94 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* =============================================================================
+   MOBILE RESPONSIVE STYLES - Add this to the END of globals.css
+   ============================================================================= */
+
+/* Tablet and below (768px) */
+@media (max-width: 768px) {
+  /* Header - stack vertically */
+  .header-content {
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+  }
+
+  /* Nav - wrap and center */
+  .nav {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  /* Page header - stack */
+  .page-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .page-title {
+    font-size: 24px !important;
+  }
+
+  /* Exposure grid - 2 columns instead of 4 */
+  .exposure-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .exposure-value {
+    font-size: 18px !important;
+  }
+
+  /* Config grid - single column */
+  .config-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Table - hide header, stack rows */
+  .table-header {
+    display: none !important;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    padding: 16px !important;
+    border-radius: 12px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Footer - stack */
+  .footer-content {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 16px !important;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 20px !important;
+    text-align: center !important;
+  }
+
+  .exposure-grid {
+    gap: 8px !important;
+  }
+
+  .exposure-value {
+    font-size: 16px !important;
+  }
+
+  /* Prevent iOS zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
