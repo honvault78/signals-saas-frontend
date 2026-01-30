@@ -518,7 +518,7 @@ export default function ValidityDashboard({
                     <FailureModeCard 
                       key={i} 
                       fm={fm} 
-                      isPrimary={validityFull.detection.primary_failure_mode?.failure_mode === fm.failure_mode}
+                      isPrimary={validityFull.detection.primary_fm?.failure_mode === fm.failure_mode}
                     />
                   ))}
                 </div>
