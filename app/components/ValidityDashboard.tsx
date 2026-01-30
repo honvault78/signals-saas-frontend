@@ -508,13 +508,13 @@ export default function ValidityDashboard({
             )}
             
             {/* Active Failure Modes */}
-            {validityFull.detection?.active_failure_modes?.length > 0 && (
+            {validityFull.detection?.active_fms?.length > 0 && (
               <div style={{ marginBottom: 24 }}>
                 <div style={{ color: '#e74c3c', fontSize: 12, fontWeight: 600, marginBottom: 12 }}>
                   ACTIVE FAILURE MODES
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {validityFull.detection.active_failure_modes.map((fm, i) => (
+                  {validityFull.detection.active_fms.map((fm, i) => (
                     <FailureModeCard 
                       key={i} 
                       fm={fm} 
