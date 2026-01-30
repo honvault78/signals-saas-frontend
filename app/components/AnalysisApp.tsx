@@ -16,6 +16,16 @@ import {
 } from "../hooks/useDatabase";
 
 // =============================================================================
+// UPLOAD DATA COMPONENT
+// =============================================================================
+import UploadDataPanel from "./UploadDataPanel";
+
+// =============================================================================
+// VALIDITY DASHBOARD COMPONENT
+// =============================================================================
+import ValidityDashboard from "./ValidityDashboard";
+
+// =============================================================================
 // TYPES
 // =============================================================================
 
@@ -45,7 +55,8 @@ type AnalysisAppProps = {
   authFetch: AuthFetch;
 };
 
-type TabId = 'analysis' | 'history' | 'alerts' | 'settings';
+// Tabs: Markets (analysis), Upload Data, History
+type TabId = 'analysis' | 'upload' | 'history';
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE?.trim() || "http://localhost:8000";
@@ -665,7 +676,7 @@ function HistoryPanel({ analyses, loading, onView, onDelete, viewingHtml, onClos
                     padding: '8px 12px',
                     borderRadius: 8,
                     border: 'none',
-                    background: 'rgba(231, 76, 60, 0.1)',
+                    background: 'rgba(231, 76, 60, 0.15)',
                     color: '#e74c3c',
                     fontSize: 13,
                     cursor: 'pointer',
@@ -695,6 +706,19 @@ interface AlertsPanelProps {
   onDelete: (id: string) => Promise<void>;
 }
 
+function getAlertColor(type: string) {
+  switch (type) {
+    case 'BUY_SIGNAL':
+      return { bg: 'rgba(0, 184, 148, 0.1)', border: 'rgba(0, 184, 148, 0.3)', color: '#00b894' };
+    case 'SELL_SIGNAL':
+      return { bg: 'rgba(231, 76, 60, 0.1)', border: 'rgba(231, 76, 60, 0.3)', color: '#e74c3c' };
+    case 'REGIME_CHANGE':
+      return { bg: 'rgba(243, 156, 18, 0.1)', border: 'rgba(243, 156, 18, 0.3)', color: '#f39c12' };
+    default:
+      return { bg: 'rgba(79, 195, 247, 0.1)', border: 'rgba(79, 195, 247, 0.3)', color: '#4fc3f7' };
+  }
+}
+
 function AlertsPanel({ alerts, loading, unreadCount, onMarkRead, onMarkAllRead, onDelete }: AlertsPanelProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -704,14 +728,6 @@ function AlertsPanel({ alerts, loading, unreadCount, onMarkRead, onMarkAllRead, 
       await onDelete(id);
     } finally {
       setDeletingId(null);
-    }
-  };
-
-  const getAlertColor = (type: string) => {
-    switch (type) {
-      case 'buy': return { bg: 'rgba(0, 184, 148, 0.1)', border: 'rgba(0, 184, 148, 0.2)', color: '#00b894' };
-      case 'sell': return { bg: 'rgba(231, 76, 60, 0.1)', border: 'rgba(231, 76, 60, 0.2)', color: '#e74c3c' };
-      default: return { bg: 'rgba(79, 195, 247, 0.1)', border: 'rgba(79, 195, 247, 0.2)', color: '#4fc3f7' };
     }
   };
 
@@ -732,7 +748,7 @@ function AlertsPanel({ alerts, loading, unreadCount, onMarkRead, onMarkAllRead, 
               borderRadius: 8,
               border: '1px solid rgba(255,255,255,0.15)',
               background: 'transparent',
-              color: '#fff',
+              color: '#888',
               fontSize: 13,
               cursor: 'pointer',
             }}
@@ -831,6 +847,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
   // STATE
   // =============================================================================
   
+  // UPDATED: Default to 'analysis' tab
   const [activeTab, setActiveTab] = useState<TabId>('analysis');
   const [portfolioName, setPortfolioName] = useState("Long/Short Portfolio");
   const [days, setDays] = useState(180);
@@ -848,6 +865,12 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
   const [analysisSaving, setAnalysisSaving] = useState(false);
   const [analysisSaved, setAnalysisSaved] = useState(false);
   const [viewingHistoryHtml, setViewingHistoryHtml] = useState<string | null>(null);
+  
+  // VALIDITY STATE
+  const [validityData, setValidityData] = useState<any>(null);
+  
+  // AI MEMO TOGGLE
+  const [includeAiMemo, setIncludeAiMemo] = useState(true);
   
   const [toasts, setToasts] = useState<Toast[]>([]);
   
@@ -949,71 +972,69 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
     updateRow(id, { loading: true, error: null });
 
     try {
-      const res = await authFetch(`${API_BASE}/resolve?q=${encodeURIComponent(query)}`, { signal: ac.signal });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fetch(`${API_BASE}/resolve?q=${encodeURIComponent(query)}`, {
+        signal: ac.signal,
+      });
+      if (!res.ok) throw new Error("Search failed");
       const data = await res.json();
-      const candidates: Candidate[] = Array.isArray(data?.candidates) ? data.candidates : [];
-      updateRow(id, { candidates, loading: false, error: null });
+      const cands = data.candidates || [];
 
-      if (data?.auto_selected && candidates.length > 0) {
-        updateRow(id, { resolvedSymbol: candidates[0].provider_symbol });
+      if (data.auto_selected && cands.length > 0) {
+        updateRow(id, {
+          resolvedSymbol: cands[0].provider_symbol,
+          candidates: [],
+          loading: false,
+        });
+      } else {
+        updateRow(id, { candidates: cands, loading: false });
       }
     } catch (e: any) {
-      if (e?.name === "AbortError") return;
-      updateRow(id, { candidates: [], loading: false, error: e?.message || "Failed to resolve" });
+      if (e.name !== "AbortError") {
+        updateRow(id, { loading: false, error: e.message || "Search error" });
+      }
     }
   }
-
-  useEffect(() => {
-    const timers: any[] = [];
-    for (const r of rows) {
-      const t = setTimeout(() => resolveRow(r.id, r.query), 300);
-      timers.push(t);
-    }
-    return () => timers.forEach(clearTimeout);
-  }, [rows.map((r) => r.query).join("|")]);
 
   // =============================================================================
   // PORTFOLIO HANDLERS
   // =============================================================================
-  
+
   const handleLoadPortfolio = useCallback((portfolio: Portfolio) => {
-    setRows(portfolio.positions.map(p => ({
-      id: uid(),
-      query: p.ticker,
-      resolvedSymbol: p.ticker,
-      amount: p.amount,
-      candidates: [],
-      loading: false,
-      error: null,
-    })));
-    setPortfolioName(portfolio.name);
     setSelectedPortfolioId(portfolio.id);
-    setHtml('');
+    setPortfolioName(portfolio.name);
+    setRows(
+      portfolio.positions.map((p) => ({
+        id: uid(),
+        query: p.ticker,
+        resolvedSymbol: p.ticker,
+        amount: p.amount,
+        candidates: [],
+        loading: false,
+        error: null,
+      }))
+    );
+    setHtml("");
     setAnalysisSaved(false);
-    showToast('success', `Loaded: ${portfolio.name}`);
+    showToast('success', `Loaded "${portfolio.name}"`);
   }, [showToast]);
-  
+
   const handleSavePortfolio = useCallback(async (name: string, description: string) => {
     try {
-      const portfolio = await savePortfolio(name, currentPositions, { description: description || undefined });
-      setSelectedPortfolioId(portfolio.id);
-      setPortfolioName(name);
-      showToast('success', 'Portfolio saved!');
-    } catch (err) {
-      showToast('error', 'Failed to save portfolio');
-      throw err;
+      const saved = await savePortfolio(name, description, currentPositions);
+      setSelectedPortfolioId(saved.id);
+      showToast('success', `Portfolio "${name}" saved!`);
+    } catch (e: any) {
+      showToast('error', e.message || 'Failed to save portfolio');
     }
-  }, [currentPositions, savePortfolio, showToast]);
-  
+  }, [savePortfolio, currentPositions, showToast]);
+
   const handleDeletePortfolio = useCallback(async (id: string) => {
     try {
       await deletePortfolio(id);
       if (selectedPortfolioId === id) setSelectedPortfolioId(null);
       showToast('success', 'Portfolio deleted');
-    } catch (err) {
-      showToast('error', 'Failed to delete');
-      throw err;
+    } catch (e: any) {
+      showToast('error', e.message || 'Failed to delete portfolio');
     }
   }, [deletePortfolio, selectedPortfolioId, showToast]);
 
@@ -1025,17 +1046,18 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
     setRunError(null);
     setHtml("");
     setAnalysisSaved(false);
+    setValidityData(null); // Reset validity
 
     const positions = rows
-      .map((r) => ({ ticker: r.resolvedSymbol, amount: Number(r.amount || 0) }))
-      .filter((p) => p.ticker && p.amount !== 0);
+      .filter((r) => r.resolvedSymbol && Number(r.amount || 0) !== 0)
+      .map((r) => ({ ticker: r.resolvedSymbol!, amount: Number(r.amount) }));
 
     if (positions.length === 0) {
-      setRunError("Please add at least one position with a resolved ticker and non-zero amount.");
+      setRunError("Please add at least one position with a resolved ticker and amount.");
       return;
     }
 
-    const bad = rows.find((r) => (Number(r.amount || 0) !== 0) && !r.resolvedSymbol);
+    const bad = rows.find((r) => Number(r.amount || 0) !== 0 && !r.resolvedSymbol);
     if (bad) {
       setRunError("One or more positions has an amount but no selected ticker.");
       return;
@@ -1044,13 +1066,14 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
     const payload = {
       portfolio_name: portfolioName,
       analysis_period_days: Number(days || 180),
-      include_ai_memo: true,
+      include_ai_memo: includeAiMemo,
       positions,
     };
 
     setRunning(true);
     try {
-      const res = await authFetch(`${API_BASE}/analyze/report`, {
+      // Call /analyze to get JSON with validity data
+      const res = await authFetch(`${API_BASE}/analyze`, {
         method: "POST",
         body: JSON.stringify(payload),
       });
@@ -1062,11 +1085,21 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
         throw new Error(`Analysis failed: ${txt || `HTTP ${res.status}`}`);
       }
 
-      const htmlText = await res.text();
-      setHtml(htmlText);
+      const data = await res.json();
       
+      // Set HTML report
+      setHtml(data.html_report || "");
+      
+      // Capture validity data
+      if (data.validity) {
+        setValidityData({
+          ...data.validity,
+          full: data.validity_full || null,
+        });
+      }
+
       setTimeout(() => {
-        document.getElementById('report-section')?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById("report-section")?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     } catch (e: any) {
       setRunError(e?.message || "Failed to run analysis");
@@ -1074,18 +1107,13 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
       setRunning(false);
     }
   }
-  
+
   const handleSaveAnalysis = useCallback(async () => {
     setAnalysisSaving(true);
     try {
-      await saveAnalysis(
-        portfolioName,
-        currentPositions,
-        days,
-        {}, // result_summary - would need to parse from analysis
-        html,
-        { portfolio_id: selectedPortfolioId || undefined }
-      );
+      await saveAnalysis(portfolioName, currentPositions, days, {}, html, {
+        portfolio_id: selectedPortfolioId || undefined,
+      });
       setAnalysisSaved(true);
       showToast('success', 'Analysis saved to history!');
     } catch (err) {
@@ -1094,7 +1122,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
       setAnalysisSaving(false);
     }
   }, [portfolioName, currentPositions, days, html, selectedPortfolioId, saveAnalysis, showToast]);
-  
+
   const handleViewAnalysis = useCallback(async (id: string) => {
     const analysis = await getAnalysis(id);
     if (analysis.html_report) {
@@ -1119,11 +1147,19 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
             </div>
           </div>
           <nav style={styles.nav} className="nav">
+            {/* Markets tab */}
             <button
               onClick={() => setActiveTab('analysis')}
               style={activeTab === 'analysis' ? styles.navLinkActive : styles.navLink}
             >
-              Analysis
+              Markets
+            </button>
+            {/* NEW: Upload Data tab */}
+            <button
+              onClick={() => setActiveTab('upload')}
+              style={activeTab === 'upload' ? styles.navLinkActive : styles.navLink}
+            >
+              Upload Data
             </button>
             <button
               onClick={() => setActiveTab('history')}
@@ -1149,36 +1185,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                 </span>
               )}
             </button>
-            <button
-              onClick={() => setActiveTab('alerts')}
-              style={{
-                ...(activeTab === 'alerts' ? styles.navLinkActive : styles.navLink),
-                position: 'relative',
-              }}
-            >
-              Alerts
-              {unreadCount > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: -4,
-                  right: -4,
-                  background: '#e74c3c',
-                  color: '#fff',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  padding: '2px 6px',
-                  borderRadius: 10,
-                }}>
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('settings')}
-              style={activeTab === 'settings' ? styles.navLinkActive : styles.navLink}
-            >
-              Settings
-            </button>
+            
             <div style={styles.userButton}>
               <UserButton afterSignOutUrl="/" />
             </div>
@@ -1191,16 +1198,16 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
         <div style={styles.container}>
           
           {/* ============================================= */}
-          {/* ANALYSIS TAB */}
+          {/* PUBLIC EQUITIES TAB (formerly "Analysis") */}
           {/* ============================================= */}
           {activeTab === 'analysis' && (
             <>
               {/* Page Header with Portfolio Toolbar */}
               <div style={{ ...styles.pageHeader, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }} className="page-header">
                 <div>
-                  <h1 style={styles.pageTitle} className="page-title">Portfolio Analysis</h1>
+                  <h1 style={styles.pageTitle} className="page-title">Markets</h1>
                   <p style={styles.pageSubtitle}>
-                    Build and analyze long/short portfolios with AI-powered regime detection
+                    Build and analyze portfolios with regime-aware validity diagnostics
                   </p>
                 </div>
                 <PortfolioToolbar
@@ -1241,8 +1248,8 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                           <option value={30}>30 Days</option>
                           <option value={60}>60 Days</option>
                           <option value={90}>90 Days</option>
-                          <option value={180}>180 Days</option>
-                          <option value={365}>365 Days</option>
+                          <option value={180}>6 Months</option>
+                          <option value={365}>1 Year</option>
                         </select>
                       </div>
                     </div>
@@ -1298,94 +1305,127 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                     <div style={styles.tableHeaderCell}></div>
                   </div>
 
-                  {/* Table Rows */}
-                  {rows.map((r) => (
-                    <div key={r.id} style={styles.tableRow} className="table-row">
-                      <div style={styles.tableCell}>
-                        <input
-                          value={r.query}
-                          onChange={(e) => updateRow(r.id, { query: e.target.value, resolvedSymbol: null })}
-                          placeholder="Search ticker or company..."
-                          style={styles.tickerInput}
-                        />
-                        {r.loading && (
-                          <div style={styles.searchingIndicator}>
-                            <Spinner size={14} /> Searching...
-                          </div>
-                        )}
-                        {r.error && <div style={styles.errorText}>{r.error}</div>}
-                        {!r.resolvedSymbol && r.candidates.length > 0 && (
-                          <div style={styles.candidatesList}>
-                            {r.candidates.slice(0, 5).map((c) => (
-                              <button
-                                key={`${c.provider}-${c.provider_symbol}`}
-                                onClick={() => updateRow(r.id, { resolvedSymbol: c.provider_symbol })}
-                                style={styles.candidateButton}
-                              >
-                                <span style={styles.candidateSymbol}>{c.provider_symbol}</span>
-                                <span style={styles.candidateName}>{c.name}</span>
-                                <span style={styles.candidateMeta}>
-                                  {c.exchange} {c.currency && `· ${c.currency}`}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                  {/* Rows */}
+                  {rows.map((row) => {
+                    const amt = Number(row.amount || 0);
+                    const direction = amt > 0 ? "LONG" : amt < 0 ? "SHORT" : "—";
+                    const dirColor = amt > 0 ? "#00b894" : amt < 0 ? "#e74c3c" : "#666";
 
-                      <div style={styles.tableCell}>
-                        <input
-                          value={r.amount || ''}
-                          onChange={(e) => updateRow(r.id, { amount: Number(e.target.value) || 0 })}
-                          type="number"
-                          placeholder="0"
-                          style={styles.amountInput}
-                        />
-                      </div>
+                    return (
+                      <div key={row.id} style={styles.tableRow} className="table-row">
+                        {/* Instrument Cell */}
+                        <div style={styles.tableCell}>
+                          <input
+                            value={row.query}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              updateRow(row.id, { query: val, resolvedSymbol: null, candidates: [], error: null });
+                            }}
+                            onBlur={() => resolveRow(row.id, row.query)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") resolveRow(row.id, row.query);
+                            }}
+                            placeholder="Ticker or company name"
+                            style={styles.tickerInput}
+                          />
+                          {row.loading && (
+                            <div style={styles.searchingIndicator}>
+                              <Spinner size={14} /> Searching...
+                            </div>
+                          )}
+                          {row.error && <div style={styles.errorText}>{row.error}</div>}
+                          {row.candidates.length > 0 && !row.resolvedSymbol && (
+                            <div style={styles.candidatesList}>
+                              {row.candidates.map((c) => (
+                                <button
+                                  key={c.provider_symbol}
+                                  onClick={() => {
+                                    updateRow(row.id, {
+                                      resolvedSymbol: c.provider_symbol,
+                                      query: c.provider_symbol,
+                                      candidates: [],
+                                    });
+                                  }}
+                                  style={styles.candidateButton}
+                                >
+                                  <span style={styles.candidateSymbol}>{c.provider_symbol}</span>
+                                  <span style={styles.candidateName}>{c.name}</span>
+                                  <span style={styles.candidateMeta}>
+                                    {c.exchange} {c.currency && `• ${c.currency}`}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
 
-                      <div style={styles.tableCell}>
-                        <span style={{
-                          ...styles.directionBadge,
-                          background: Number(r.amount) >= 0 ? 'rgba(0, 184, 148, 0.15)' : 'rgba(231, 76, 60, 0.15)',
-                          color: Number(r.amount) >= 0 ? '#00b894' : '#e74c3c',
-                        }}>
-                          {Number(r.amount) >= 0 ? 'LONG' : 'SHORT'}
-                        </span>
-                      </div>
+                        {/* Amount Cell */}
+                        <div>
+                          <input
+                            type="number"
+                            value={row.amount || ""}
+                            onChange={(e) => updateRow(row.id, { amount: Number(e.target.value) || 0 })}
+                            placeholder="0"
+                            style={styles.amountInput}
+                          />
+                        </div>
 
-                      <div style={styles.tableCell}>
-                        {r.resolvedSymbol ? (
-                          <div style={styles.resolvedStatus}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00b894" strokeWidth="2">
-                              <path d="M20 6L9 17l-5-5" />
+                        {/* Direction Cell */}
+                        <div>
+                          <span
+                            style={{
+                              ...styles.directionBadge,
+                              background: `${dirColor}20`,
+                              color: dirColor,
+                            }}
+                          >
+                            {direction}
+                          </span>
+                        </div>
+
+                        {/* Status Cell */}
+                        <div>
+                          {row.resolvedSymbol ? (
+                            <div style={styles.resolvedStatus}>
+                              <svg width="16" height="16" fill="none" stroke="#00b894" strokeWidth="2" viewBox="0 0 24 24">
+                                <path d="M20 6L9 17l-5-5" />
+                              </svg>
+                              <span style={styles.resolvedSymbol}>{row.resolvedSymbol}</span>
+                            </div>
+                          ) : (
+                            <span style={styles.pendingStatus}>
+                              {row.query ? "Select ticker" : "Enter ticker"}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Remove Button */}
+                        <div>
+                          <button
+                            onClick={() => removeRow(row.id)}
+                            disabled={rows.length <= 2}
+                            style={{
+                              ...styles.removeButton,
+                              opacity: rows.length <= 2 ? 0.3 : 1,
+                              cursor: rows.length <= 2 ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <line x1="18" y1="6" x2="6" y2="18" />
+                              <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
-                            <span style={styles.resolvedSymbol}>{r.resolvedSymbol}</span>
-                          </div>
-                        ) : (
-                          <span style={styles.pendingStatus}>Pending</span>
-                        )}
+                          </button>
+                        </div>
                       </div>
-
-                      <div style={styles.tableCell}>
-                        <button
-                          onClick={() => removeRow(r.id)}
-                          style={styles.removeButton}
-                          disabled={rows.length <= 2}
-                        >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Error Message */}
+              {/* Error Banner */}
               {runError && (
                 <div style={styles.errorBanner}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -1395,23 +1435,34 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
               )}
 
               {/* Run Button */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', color: '#888', fontSize: 14 }}>
+                  <input
+                    type="checkbox"
+                    checked={includeAiMemo}
+                    onChange={(e) => setIncludeAiMemo(e.target.checked)}
+                    style={{ width: 18, height: 18, cursor: 'pointer' }}
+                  />
+                  Include Memo
+                </label>
+              </div>
               <button
                 onClick={runAnalysis}
-                disabled={running || !hasPositions}
+                disabled={running || !allResolved || !hasPositions}
                 style={{
                   ...styles.runButton,
-                  opacity: (running || !hasPositions) ? 0.6 : 1,
-                  cursor: (running || !hasPositions) ? 'not-allowed' : 'pointer',
+                  opacity: running || !allResolved || !hasPositions ? 0.6 : 1,
+                  cursor: running || !allResolved || !hasPositions ? "not-allowed" : "pointer",
                 }}
               >
                 {running ? (
                   <>
                     <Spinner size={20} />
-                    Generating Analysis...
+                    Running Analysis...
                   </>
                 ) : (
                   <>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <polygon points="5 3 19 12 5 21 5 3" />
                     </svg>
                     Run Analysis
@@ -1422,29 +1473,27 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
               {/* Report Section */}
               {html && (
                 <div id="report-section">
-                  {/* Save to History Card */}
                   <SaveAnalysisCard
                     onSave={handleSaveAnalysis}
                     saving={analysisSaving}
                     saved={analysisSaved}
                   />
-                  
                   <div style={styles.reportCard}>
                     <div style={styles.reportHeader}>
                       <h2 style={styles.cardTitle}>Analysis Report</h2>
                       <button
                         onClick={() => {
-                          const blob = new Blob([html], { type: 'text/html' });
+                          const blob = new Blob([html], { type: "text/html" });
                           const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
+                          const a = document.createElement("a");
                           a.href = url;
-                          a.download = `${portfolioName.replace(/\s+/g, '_')}_report.html`;
+                          a.download = `${portfolioName.replace(/\s+/g, "_")}_analysis.html`;
                           a.click();
                           URL.revokeObjectURL(url);
                         }}
                         style={styles.downloadButton}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                           <polyline points="7 10 12 15 17 10" />
                           <line x1="12" y1="15" x2="12" y2="3" />
@@ -1452,11 +1501,23 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                         Download Report
                       </button>
                     </div>
-                    <iframe srcDoc={html} style={styles.reportIframe} title="Analysis Report" />
+                    <iframe srcDoc={html} style={styles.reportIframe} />
                   </div>
                 </div>
               )}
             </>
+          )}
+
+          {/* ============================================= */}
+          {/* UPLOAD DATA TAB (NEW) */}
+          {/* ============================================= */}
+          {activeTab === 'upload' && (
+            <UploadDataPanel 
+              apiBase={API_BASE}
+              onAnalysisComplete={(html) => {
+                showToast('success', 'Analysis complete!');
+              }}
+            />
           )}
 
           {/* ============================================= */}
@@ -1473,30 +1534,6 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
             />
           )}
 
-          {/* ============================================= */}
-          {/* ALERTS TAB */}
-          {/* ============================================= */}
-          {activeTab === 'alerts' && (
-            <AlertsPanel
-              alerts={alerts}
-              loading={alertsLoading}
-              unreadCount={unreadCount}
-              onMarkRead={markAsRead}
-              onMarkAllRead={markAllAsRead}
-              onDelete={deleteAlert}
-            />
-          )}
-
-          {/* ============================================= */}
-          {/* SETTINGS TAB */}
-          {/* ============================================= */}
-          {activeTab === 'settings' && (
-            <div style={{ marginTop: 24 }}>
-              <h2 style={{ color: '#fff', fontSize: 20, fontWeight: 600 }}>Settings</h2>
-              <p style={{ color: '#666', marginTop: 8 }}>Coming soon...</p>
-            </div>
-          )}
-
         </div>
       </main>
 
@@ -1508,11 +1545,11 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
             <span style={styles.footerTagline}>Quantitative Analytics</span>
           </div>
           <div style={styles.footerLinks}>
-            <a href="#" style={styles.footerLink}>Documentation</a>
-            <a href="#" style={styles.footerLink}>Support</a>
-            <a href="#" style={styles.footerLink}>Privacy</a>
+            <a href="/documentation.html" style={styles.footerLink}>Documentation</a>
+            <a href="mailto:support@bavella-technologies.com" style={styles.footerLink}>Support</a>
+            <a href="/privacy.html" style={styles.footerLink}>Privacy</a>
           </div>
-          <span style={styles.footerCopyright}>© {new Date().getFullYear()} Bavella Technologies</span>
+          <span style={styles.footerCopyright}>© 2026 Bavella Technologies Sarl</span>
         </div>
       </footer>
 
@@ -1532,7 +1569,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
 }
 
 // =============================================================================
-// STYLES (keeping your existing styles)
+// STYLES
 // =============================================================================
 
 const styles: Record<string, React.CSSProperties> = {
@@ -1642,8 +1679,8 @@ const styles: Record<string, React.CSSProperties> = {
     background: 'rgba(30, 42, 58, 0.5)',
     borderRadius: 16,
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    overflow: 'hidden',
     marginBottom: 24,
+    overflow: 'hidden',
   },
   cardHeader: {
     padding: '20px 24px',

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation | Bavella</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-orange: #db6d28;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .nav-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .nav-version {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .nav-link {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            transition: all 0.15s ease;
+        }
+        
+        .nav-link:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .nav-link.active {
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent-blue);
+        }
+        
+        /* Main Content */
+        .main {
+            margin-left: 280px;
+            padding: 48px 64px;
+            max-width: 1000px;
+        }
+        
+        .page-header {
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-title {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+        
+        /* Content Sections */
+        .section {
+            margin-bottom: 64px;
+        }
+        
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 32px 0 16px 0;
+            color: var(--text-primary);
+        }
+        
+        h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 24px 0 12px 0;
+            color: var(--text-secondary);
+        }
+        
+        p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .lead {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+        
+        /* Callout Boxes */
+        .callout {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 24px 0;
+            border-left: 4px solid;
+        }
+        
+        .callout-info {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: var(--accent-blue);
+        }
+        
+        .callout-warning {
+            background: rgba(210, 153, 34, 0.1);
+            border-color: var(--accent-yellow);
+        }
+        
+        .callout-danger {
+            background: rgba(248, 81, 73, 0.1);
+            border-color: var(--accent-red);
+        }
+        
+        .callout-success {
+            background: rgba(63, 185, 80, 0.1);
+            border-color: var(--accent-green);
+        }
+        
+        .callout-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .callout p {
+            margin-bottom: 0;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            color: var(--text-secondary);
+        }
+        
+        tr:hover td {
+            background: var(--bg-secondary);
+        }
+        
+        /* Code/Badge styling */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+        
+        .badge-green { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+        .badge-yellow { background: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); }
+        .badge-red { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+        .badge-blue { background: rgba(88, 166, 255, 0.2); color: var(--accent-blue); }
+        .badge-purple { background: rgba(163, 113, 247, 0.2); color: var(--accent-purple); }
+        .badge-gray { background: var(--bg-tertiary); color: var(--text-secondary); }
+        
+        /* FM Cards */
+        .fm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+        
+        .fm-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.15s ease;
+        }
+        
+        .fm-card:hover {
+            border-color: var(--accent-blue);
+        }
+        
+        .fm-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .fm-code {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            color: var(--accent-orange);
+        }
+        
+        .fm-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .fm-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .fm-impact {
+            font-size: 13px;
+            color: var(--text-muted);
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .fm-impact strong {
+            color: var(--text-secondary);
+        }
+        
+        /* State Cards */
+        .state-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 24px 0;
+        }
+        
+        .state-card {
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .state-card-valid {
+            background: linear-gradient(135deg, rgba(63, 185, 80, 0.15) 0%, rgba(63, 185, 80, 0.05) 100%);
+            border: 1px solid rgba(63, 185, 80, 0.3);
+        }
+        
+        .state-card-degraded {
+            background: linear-gradient(135deg, rgba(210, 153, 34, 0.15) 0%, rgba(210, 153, 34, 0.05) 100%);
+            border: 1px solid rgba(210, 153, 34, 0.3);
+        }
+        
+        .state-card-broken {
+            background: linear-gradient(135deg, rgba(248, 81, 73, 0.15) 0%, rgba(248, 81, 73, 0.05) 100%);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+        }
+        
+        .state-name {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .state-card-valid .state-name { color: var(--accent-green); }
+        .state-card-degraded .state-name { color: var(--accent-yellow); }
+        .state-card-broken .state-name { color: var(--accent-red); }
+        
+        .state-range {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .state-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* Flow diagram */
+        .flow-diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        
+        .flow-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin: 16px 0;
+        }
+        
+        .flow-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        
+        .flow-box-highlight {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+        
+        .flow-arrow {
+            color: var(--text-muted);
+            font-size: 20px;
+        }
+        
+        /* Quote */
+        blockquote {
+            border-left: 4px solid var(--accent-purple);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+        
+        blockquote cite {
+            display: block;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-style: normal;
+        }
+        
+        /* Lists */
+        ul, ol {
+            margin: 16px 0;
+            padding-left: 24px;
+            color: var(--text-secondary);
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main {
+                padding: 32px 40px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .nav {
+                display: none;
+            }
+            .main {
+                margin-left: 0;
+                padding: 24px;
+            }
+            .state-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Anchor links */
+        .anchor {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 8px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        
+        h2:hover .anchor,
+        h3:hover .anchor {
+            opacity: 1;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 64px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-logo">Bavella</div>
+        <div class="nav-version">Documentation v2.2</div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Overview</div>
+            <a href="#introduction" class="nav-link active">Introduction</a>
+            <a href="#philosophy" class="nav-link">Philosophy</a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Validity Engine</div>
+            <a href="#validity-states" class="nav-link">Validity States</a>
+            <a href="#failure-modes" class="nav-link">Failure Modes</a>
+            <a href="#root-cause" class="nav-link">Root Cause Analysis</a>
+            <a href="#confidence" class="nav-link">Confidence Governance</a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Regime Detection</div>
+            <a href="#regime-overview" class="nav-link">Overview</a>
+            <a href="#regime-modes" class="nav-link">Market Regimes</a>
+            <a href="#regime-signals" class="nav-link">Signal Generation</a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Integration</div>
+            <a href="#hierarchy" class="nav-link">Decision Hierarchy</a>
+            <a href="#interpretation" class="nav-link">Interpreting Results</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="page-header">
+            <h1 class="page-title">Methodology Documentation</h1>
+            <p class="page-subtitle">Understanding Structural Validity Assessment and Market Regime Detection</p>
+        </header>
+
+        <!-- Introduction -->
+        <section id="introduction" class="section">
+            <h2>Introduction <a href="#introduction" class="anchor">#</a></h2>
+            <p class="lead">
+                Bavella continuously audits whether historical statistical evidence remains admissible for decision-making. It answers the question every analyst eventually asks: <em>"Can I still trust the analysis I'm looking at?"</em>
+            </p>
+            <p>
+                Traditional analysis relies on historical statistical relationships to inform decisions. Bavella focuses on a prior question: whether those relationships remain structurally admissible under current market conditions.
+            </p>
+            <p>
+                Bavella monitors the <strong>epistemic validity</strong> of analytical relationships—detecting when statistical assumptions have degraded to the point where conclusions should no longer be trusted.
+            </p>
+            
+            <div class="callout callout-info">
+                <div class="callout-title">Key Insight</div>
+                <p>Sound decisions depend less on being right than on knowing whether the underlying evidence remains admissible. Bavella continuously evaluates when statistical conclusions should no longer be relied upon.</p>
+            </div>
+            
+            <div class="callout callout-success" style="border-color: var(--accent-purple); background: rgba(163, 113, 247, 0.1);">
+                <div class="callout-title">Under the Hood (Conceptual)</div>
+                <p>Each validity assessment is derived from:</p>
+                <ul style="margin-top: 12px; margin-bottom: 0; color: var(--text-secondary);">
+                    <li>Multiple rolling windows (short / medium / long horizon) with cross-validation</li>
+                    <li>Ensemble statistical tests with internal consistency checks</li>
+                    <li>Failure-mode interaction graphs evaluated per episode</li>
+                    <li>Historical episode fingerprinting for contextual calibration</li>
+                    <li>Precedence-weighted aggregation with kill-switch overrides</li>
+                </ul>
+                <p style="margin-top: 12px; margin-bottom: 0;">The methodology is deterministic but stateful—conclusions depend on the joint behavior of tests over time, not point estimates.</p>
+            </div>
+        </section>
+
+        <!-- Philosophy -->
+        <section id="philosophy" class="section">
+            <h2>Philosophy <a href="#philosophy" class="anchor">#</a></h2>
+            
+            <p>
+                Bavella was designed with several non-negotiable principles:
+            </p>
+            
+            <h4>1. Transparency Over Black Boxes</h4>
+            <p>
+                Every validity assessment includes a clear explanation of <em>why</em> the conclusion was reached. Root causes are distinguished from symptoms. Evidence is preserved for audit.
+            </p>
+            
+            <h4>2. Conservative Under Uncertainty</h4>
+            <p>
+                When the system is uncertain, it becomes <em>more</em> conservative, not less. Uncertainty should never make things look better than they are.
+            </p>
+            
+            <h4>3. Fixed Logic, No Optimization</h4>
+            <p>
+                Bavella does not learn from outcomes or optimize parameters post-hoc. The detection logic is frozen and versioned. Thresholds are derived from first principles and statistical theory, not backtested to historical P&L. This prevents overfitting and ensures reproducibility—the same inputs will always produce the same outputs.
+            </p>
+            
+            <h4>4. Scope: Structure, Not Strategy</h4>
+            <p>
+                Validity assessment evaluates the <em>structural integrity</em> of the underlying statistical relationships. It does not judge whether a trade is good or bad—only whether the analysis supporting that trade can be trusted.
+            </p>
+        </section>
+
+        <!-- Validity States -->
+        <section id="validity-states" class="section">
+            <h2>Validity States <a href="#validity-states" class="anchor">#</a></h2>
+            <p>
+                Every analysis receives a validity assessment with three possible states:
+            </p>
+            
+            <div class="state-cards">
+                <div class="state-card state-card-valid">
+                    <div class="state-name">Valid</div>
+                    <div class="state-range">70–100</div>
+                    <div class="state-desc">Statistical assumptions hold. Analysis can be trusted for decision-making.</div>
+                </div>
+                <div class="state-card state-card-degraded">
+                    <div class="state-name">Degraded</div>
+                    <div class="state-range">30–69</div>
+                    <div class="state-desc">Some assumptions weakened. Interpret with caution. Consider reduced sizing.</div>
+                </div>
+                <div class="state-card state-card-broken">
+                    <div class="state-name">Broken</div>
+                    <div class="state-range">0–29</div>
+                    <div class="state-desc">Critical assumptions violated. Historical analysis may not apply.</div>
+                </div>
+            </div>
+            
+            <h3>Score Interpretation</h3>
+            <p>
+                The validity score (0–100) represents the degree to which statistical assumptions underlying the analysis remain intact. It is <em>not</em> a probability of success or a quality rating—it measures structural integrity.
+            </p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Score Range</th>
+                        <th>Interpretation</th>
+                        <th>Recommended Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-green">85–100</span></td>
+                        <td>Strong structural integrity</td>
+                        <td>Full confidence in analysis</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-green">70–84</span></td>
+                        <td>Minor deviations detected</td>
+                        <td>Normal confidence with awareness</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-yellow">50–69</span></td>
+                        <td>Moderate degradation</td>
+                        <td>Reduce position sizing; increase monitoring</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-yellow">30–49</span></td>
+                        <td>Significant degradation</td>
+                        <td>Treat signals as conditional; await stabilization</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-red">0–29</span></td>
+                        <td>Structural failure</td>
+                        <td>Do not rely on historical analysis</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Failure Modes -->
+        <section id="failure-modes" class="section">
+            <h2>Failure Modes <a href="#failure-modes" class="anchor">#</a></h2>
+            <p>
+                Bavella monitors seven canonical failure modes—specific ways that statistical assumptions can break down. Each detector is calibrated independently and contributes to the overall validity assessment.
+            </p>
+            
+            <div class="fm-grid">
+                <div class="fm-card">
+                    <div class="fm-card-header">
+                        <span class="fm-code">FM1</span>
+                        <span class="fm-name">Variance Regime Shift</span>
+                    </div>
+                    <p class="fm-description">
+                        Detects changes in volatility structure between historical and recent periods. A significant variance shift indicates that risk models calibrated to historical volatility may be unreliable.
+                    </p>
+                    <div class="fm-impact">
+                        <strong>Impact:</strong> Position sizing, risk limits, volatility-based signals
+                    </div>
+                </div>
+                
+                <div class="fm-card">
+                    <div class="fm-card-header">
+                        <span class="fm-code">FM2</span>
+                        <span class="fm-name">Mean Drift</span>
+                    </div>
+                    <p class="fm-description">
+                        Detects systematic drift in the mean level of the series. For mean-reversion strategies, a drifting mean invalidates the "revert to" target.
+                    </p>
+                    <div class="fm-impact">
+                        <strong>Impact:</strong> Mean-reversion signals, Z-score interpretation, fair value estimates
+                    </div>
+                </div>
+                
+                <div class="fm-card">
+                    <div class="fm-card-header">
+                        <span class="fm-code">FM3</span>
+                        <span class="fm-name">Seasonality Mismatch</span>
+                    </div>
+                    <p class="fm-description">
+                        Detects changes in seasonal patterns including period shifts, amplitude changes, and phase drift. Affects strategies relying on calendar effects.
+                    </p>
+                    <div class="fm-impact">
+                        <strong>Impact:</strong> Calendar spreads, earnings patterns, cyclical timing
+                    </div>
+                </div>
+                
+                <div class="fm-card">
+                    <div class="fm-card-header">
+                        <span class="fm-code">FM4</span>
+                        <span class="fm-name">Structural Break</span>
+                    </div>
+                    <p class="fm-description">
+                        Detects discrete, potentially irreversible changes in the underlying data-generating process. The most severe failure mode—indicates fundamental regime change.
+                    </p>
+                    <div class="fm-impact">
+                        <strong>Impact:</strong> All historical analysis; may require model rebuilding
+                    </div>
+                </div>
+                
+                <div class="fm-card">
+                    <div class="fm-card-header">
+                        <span class="fm-code">FM5</span>
+                        <span class="fm-name">Outlier Contamination</span>
+                    </div>
+                    <p class="fm-description">
+                        Detects abnormal concentration of extreme observations that distort parameter estimates. Affects the reliability of statistical measures.
+                    </p>
+                    <div class="fm-impact">
+                        <strong>Impact:</strong> Parameter estimates, correlation, regression coefficients
+                    </div>
+                </div>
+                
+                <div class="fm-card">
+                    <div class="fm-card-header">
+                        <span class="fm-code">FM6</span>
+                        <span class="fm-name">Distributional Shift</span>
+                    </div>
+                    <p class="fm-description">
+                        Detects changes in the shape of the return distribution including skewness, kurtosis, and tail behavior. Invalidates distributional assumptions.
+                    </p>
+                    <div class="fm-impact">
+                        <strong>Impact:</strong> VaR calculations, option pricing, tail risk estimates
+                    </div>
+                </div>
+                
+                <div class="fm-card">
+                    <div class="fm-card-header">
+                        <span class="fm-code">FM7</span>
+                        <span class="fm-name">Dependency Break</span>
+                    </div>
+                    <p class="fm-description">
+                        Detects changes in relationships between series—correlation breakdown or cointegration failure. Critical for pair trades and hedging strategies.
+                    </p>
+                    <div class="fm-impact">
+                        <strong>Impact:</strong> Hedge ratios, pair relationships, cross-asset signals
+                    </div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 24px; color: var(--text-muted); font-size: 14px;">
+                Each detector employs multiple statistical tests with internal consistency requirements. A failure mode only fires when evidence converges across methods—isolated test failures are insufficient. This reduces false positives while maintaining sensitivity to genuine structural changes.
+            </p>
+            
+            <div class="callout callout-warning">
+                <div class="callout-title">Kill Switches</div>
+                <p>
+                    Certain conditions trigger immediate <span class="badge badge-red">BROKEN</span> status regardless of the computed score:
+                </p>
+                <ul style="margin-top: 12px; margin-bottom: 0;">
+                    <li><strong>FM4:</strong> Structural break magnitude exceeding 4σ</li>
+                    <li><strong>FM7:</strong> Correlation sign reversal (positive → negative or vice versa)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Root Cause Analysis -->
+        <section id="root-cause" class="section">
+            <h2>Root Cause Analysis <a href="#root-cause" class="anchor">#</a></h2>
+            <p>
+                When multiple failure modes fire simultaneously, Bavella performs root cause analysis to distinguish <em>primary</em> failures from <em>secondary symptoms</em>.
+            </p>
+            
+            <h3>The Problem with Naive Aggregation</h3>
+            <p>
+                A naive system might treat all detected failures as peers and simply sum their severities. This is incorrect because failure modes have causal relationships—one failure often <em>causes</em> others to appear.
+            </p>
+            
+            <h3>Precedence Relationships</h3>
+            <p>
+                Bavella maintains a precedence graph that encodes dominance relationships between failure modes:
+            </p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Relationship</th>
+                        <th>Meaning</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-purple">DOMINATES</span></td>
+                        <td>If A fires, B is likely a symptom</td>
+                        <td>FM4 → FM1: Structural break causes apparent variance shift</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-blue">CONDITIONS</span></td>
+                        <td>A must fire for B to be meaningful</td>
+                        <td>FM6 → FM5: Distribution shift context for outlier detection</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-yellow">AMPLIFIES</span></td>
+                        <td>Combined effect worse than sum</td>
+                        <td>FM5 + FM6: Outliers with distribution shift compound risk</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>How It Works</h3>
+            <p>
+                When failures are detected, the system:
+            </p>
+            <ol>
+                <li>Builds a subgraph of active failure modes and their relationships</li>
+                <li>Identifies the failure mode with no incoming "dominates" edges—this is the root cause</li>
+                <li>Labels dominated failures as secondary symptoms</li>
+                <li>Applies severity contributions with appropriate weighting</li>
+            </ol>
+            
+            <div class="callout callout-success">
+                <div class="callout-title">Benefit</div>
+                <p>Root cause analysis prevents double-counting and provides actionable insight. Instead of seeing "5 things are wrong," you see "FM4 caused a structural break, which triggered these downstream effects."</p>
+            </div>
+        </section>
+
+        <!-- Confidence Governance -->
+        <section id="confidence" class="section">
+            <h2>Confidence Governance <a href="#confidence" class="anchor">#</a></h2>
+            <p>
+                Every validity assessment includes a <em>confidence</em> measure that reflects certainty in the assessment itself.
+            </p>
+            
+            <h3>The Confidence Inversion Problem</h3>
+            <p>
+                A flawed approach would discount severity by confidence:
+            </p>
+            <p style="font-family: monospace; background: var(--bg-secondary); padding: 12px; border-radius: 6px;">
+                effective_severity = severity × confidence &nbsp;&nbsp;<span style="color: var(--accent-red);">← WRONG</span>
+            </p>
+            <p>
+                This makes "we're uncertain" look <em>better</em>—a severity-100 signal with 50% confidence becomes 50. That's backwards.
+            </p>
+            
+            <h3>Bavella's Approach</h3>
+            <p>
+                Confidence affects the assessment differently:
+            </p>
+            <ul>
+                <li><strong>Detection threshold:</strong> Signals below minimum confidence are not reported</li>
+                <li><strong>No severity discount:</strong> Once reported, severity is not reduced by confidence</li>
+                <li><strong>Conservative widening:</strong> Low confidence widens the DEGRADED band</li>
+                <li><strong>Separate tracking:</strong> Validity score and validity confidence are reported independently</li>
+            </ul>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Confidence Level</th>
+                        <th>Interpretation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-green">High (≥80%)</span></td>
+                        <td>Assessment is well-supported by evidence</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-yellow">Medium (60–79%)</span></td>
+                        <td>Some uncertainty; assessment is directionally correct</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-red">Low (&lt;60%)</span></td>
+                        <td>Significant uncertainty; treat as early warning</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>What Reduces Confidence</h3>
+            <p>
+                Confidence is not a tuning parameter—it emerges from the detection process. Specific conditions that reduce confidence:
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Condition</th>
+                        <th>Effect on Confidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Short effective sample size</td>
+                        <td>Statistical tests lose power; detection is less reliable</td>
+                    </tr>
+                    <tr>
+                        <td>Conflicting signals across windows</td>
+                        <td>Short-term and long-term views disagree; assessment is ambiguous</td>
+                    </tr>
+                    <tr>
+                        <td>Boundary conditions near thresholds</td>
+                        <td>Small changes could flip the verdict; conclusion is unstable</td>
+                    </tr>
+                    <tr>
+                        <td>Regime transition in progress</td>
+                        <td>System is between states; current classification may not persist</td>
+                    </tr>
+                    <tr>
+                        <td>Sparse historical analogues</td>
+                        <td>Limited precedent for this failure pattern; recovery estimates uncertain</td>
+                    </tr>
+                    <tr>
+                        <td>Multiple low-severity signals</td>
+                        <td>No clear root cause; degradation is diffuse rather than focused</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Regime Overview -->
+        <section id="regime-overview" class="section">
+            <h2>Market Regime Detection <a href="#regime-overview" class="anchor">#</a></h2>
+            <p>
+                The regime detection system classifies the current market environment to inform strategy selection and risk management. It operates <em>independently</em> from validity assessment—they measure different things.
+            </p>
+            
+            <div class="callout callout-warning">
+                <div class="callout-title">Critical Distinction</div>
+                <p>
+                    <strong>Regime classification</strong> answers: "What is the market doing right now?"<br>
+                    <strong>Validity assessment</strong> answers: "Is historical statistical evidence still admissible?"
+                </p>
+                <p style="margin-top: 12px; margin-bottom: 0;">
+                    A regime can be correctly identified inside an invalid analytical structure. If FM6 detects a distribution shift, the regime label may still be accurate—but the historical statistics used to <em>trade</em> that regime are no longer trustworthy.
+                </p>
+            </div>
+            
+            <div class="flow-diagram">
+                <div class="flow-row">
+                    <div class="flow-box">Price Series</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Statistical Tests</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Feature Extraction</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box flow-highlight">Regime Classification</div>
+                </div>
+            </div>
+            
+            <h3>What Regime Detection Measures</h3>
+            <ul>
+                <li><strong>Stationarity:</strong> Is the series mean-reverting or trending?</li>
+                <li><strong>Memory:</strong> How persistent are shocks? (Hurst exponent)</li>
+                <li><strong>Mean-reversion speed:</strong> If stationary, how fast does it revert? (Half-life)</li>
+                <li><strong>Current positioning:</strong> Where is the spread relative to fair value? (Z-score)</li>
+                <li><strong>Momentum:</strong> What is the recent directional tendency? (RSI, trend scores)</li>
+            </ul>
+        </section>
+
+        <!-- Regime Modes -->
+        <section id="regime-modes" class="section">
+            <h2>Market Regimes <a href="#regime-modes" class="anchor">#</a></h2>
+            <p>
+                The system classifies markets into five primary regimes based on statistical characteristics:
+            </p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Regime</th>
+                        <th>Characteristics</th>
+                        <th>Strategy Implication</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-green">Strong Mean Reversion</span></td>
+                        <td>High stationarity, fast half-life, extreme Z-score</td>
+                        <td>Mean-reversion strategies favored; fade extremes</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-blue">Mean Reversion</span></td>
+                        <td>Stationary, moderate half-life</td>
+                        <td>Mean-reversion with standard sizing</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-yellow">Mixed / Transitional</span></td>
+                        <td>Ambiguous stationarity, conflicting signals</td>
+                        <td>Reduce exposure; await clarity</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-purple">Trend Following</span></td>
+                        <td>Non-stationary, persistent shocks, directional momentum</td>
+                        <td>Momentum strategies; avoid mean-reversion</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-green">Pure Trend</span></td>
+                        <td>Strong non-stationarity, high Hurst, clear direction</td>
+                        <td>Trend-following with conviction</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Decision Hierarchy -->
+        <section id="hierarchy" class="section">
+            <h2>Decision Hierarchy <a href="#hierarchy" class="anchor">#</a></h2>
+            <p>
+                Validity assessment and regime detection serve different purposes and must be interpreted in the correct order:
+            </p>
+            
+            <div class="flow-diagram">
+                <div style="text-align: left; max-width: 500px; margin: 0 auto;">
+                    <div style="margin-bottom: 16px;">
+                        <strong style="color: var(--accent-blue);">1. VALIDITY (First)</strong>
+                        <p style="margin: 8px 0; color: var(--text-secondary); font-size: 14px;">
+                            "Can I trust this analysis at all?"
+                        </p>
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted); margin: 12px 0;">↓</div>
+                    <div style="margin-bottom: 16px;">
+                        <strong style="color: var(--accent-purple);">2. REGIME (Second)</strong>
+                        <p style="margin: 8px 0; color: var(--text-secondary); font-size: 14px;">
+                            "Given valid analysis, what is the market environment?"
+                        </p>
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted); margin: 12px 0;">↓</div>
+                    <div>
+                        <strong style="color: var(--accent-green);">3. SIGNAL (Third)</strong>
+                        <p style="margin: 8px 0; color: var(--text-secondary); font-size: 14px;">
+                            "Given valid analysis in this regime, what action is indicated?"
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="callout callout-danger">
+                <div class="callout-title">Critical Rule</div>
+                <p>
+                    If validity is <span class="badge badge-red">BROKEN</span>, regime signals should not be acted upon—even if the regime classification itself is accurate.
+                </p>
+                <p style="margin-top: 12px; margin-bottom: 0;">
+                    The regime detector may correctly identify "mean reversion" conditions. But if FM4 or FM7 has fired, the historical mean you're reverting <em>to</em> may no longer exist. The signal is technically correct; the trade is still wrong.
+                </p>
+            </div>
+            
+            <h3>Conditional Interpretation Matrix</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Validity State</th>
+                        <th>Regime Signal</th>
+                        <th>Interpretation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-green">VALID</span></td>
+                        <td>Any</td>
+                        <td>Trade normally based on regime and signals</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-yellow">DEGRADED</span></td>
+                        <td>Strong signal</td>
+                        <td>Consider with reduced size; monitor closely</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-yellow">DEGRADED</span></td>
+                        <td>Weak signal</td>
+                        <td>Wait for validity stabilization</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-red">BROKEN</span></td>
+                        <td>Any</td>
+                        <td>Do not trade; analysis is unreliable</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Interpretation -->
+        <section id="interpretation" class="section">
+            <h2>Interpreting Results <a href="#interpretation" class="anchor">#</a></h2>
+            
+            <h3>Reading a Validity Assessment</h3>
+            <p>
+                A complete validity assessment includes:
+            </p>
+            <ul>
+                <li><strong>State:</strong> VALID, DEGRADED, or BROKEN</li>
+                <li><strong>Score:</strong> 0–100 structural integrity measure</li>
+                <li><strong>Summary:</strong> One-line explanation of the finding</li>
+                <li><strong>Root Cause:</strong> Primary failure mode (if any)</li>
+                <li><strong>Secondary Symptoms:</strong> Downstream effects</li>
+                <li><strong>Confidence:</strong> Certainty in the assessment</li>
+                <li><strong>Historical Pattern:</strong> Similar episodes from history (if available)</li>
+            </ul>
+            
+            <h3>Common Scenarios</h3>
+            
+            <h4>Scenario 1: Valid with High Confidence</h4>
+            <p>
+                <span class="badge badge-green">VALID (85)</span> — Statistical assumptions hold. Proceed with normal analysis and sizing.
+            </p>
+            
+            <h4>Scenario 2: Degraded with Structural Break</h4>
+            <p>
+                <span class="badge badge-yellow">DEGRADED (42)</span> with FM4 as root cause — The underlying relationship has changed. Historical patterns may not repeat. Wait for stabilization or re-evaluate the thesis.
+            </p>
+            
+            <h4>Scenario 3: Degraded with Dependency Break</h4>
+            <p>
+                <span class="badge badge-yellow">DEGRADED (38)</span> with FM7 as root cause — For pair trades, this is serious. The correlation or cointegration that justified the trade has weakened. Consider exiting or reducing exposure.
+            </p>
+            
+            <h4>Scenario 4: Broken</h4>
+            <p>
+                <span class="badge badge-red">BROKEN (18)</span> — The analysis should be treated as historical reference only. Do not use for current decision-making.
+            </p>
+            
+            <div class="callout callout-info">
+                <div class="callout-title">Recovery</div>
+                <p>
+                    Validity can improve over time as conditions stabilize. Monitor degraded positions for potential recovery. When validity returns to VALID, historical patterns may become predictive again.
+                </p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Bavella Validity Engine v2.2 • © 2026 Bavella Technologies Sarl</p>
+            </footer>
+    </main>
+</body>
+</html>
