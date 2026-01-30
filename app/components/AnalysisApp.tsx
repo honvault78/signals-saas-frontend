@@ -1020,7 +1020,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
 
   const handleSavePortfolio = useCallback(async (name: string, description: string) => {
     try {
-      const saved = await savePortfolio(name, currentPositions, description);
+      const saved = await savePortfolio(name, currentPositions, { description });
       setSelectedPortfolioId(saved.id);
       showToast('success', `Portfolio "${name}" saved!`);
     } catch (e: any) {
