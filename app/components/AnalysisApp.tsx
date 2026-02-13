@@ -1245,7 +1245,6 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                           onChange={(e) => setDays(Number(e.target.value))}
                           style={styles.select}
                         >
-                          <option value={30}>30 Days</option>
                           <option value={60}>60 Days</option>
                           <option value={90}>90 Days</option>
                           <option value={180}>6 Months</option>
