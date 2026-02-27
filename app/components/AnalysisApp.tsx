@@ -871,6 +871,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
   
   // AI MEMO TOGGLE
   const [includeAiMemo, setIncludeAiMemo] = useState(true);
+  const [analysisEndDate, setAnalysisEndDate] = useState("");
   
   const [toasts, setToasts] = useState<Toast[]>([]);
   
@@ -1068,6 +1069,7 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
       analysis_period_days: Number(days || 180),
       include_ai_memo: includeAiMemo,
       positions,
+      ...(analysisEndDate ? { analysis_end_date: analysisEndDate } : {}),
     };
 
     setRunning(true);
@@ -1251,6 +1253,25 @@ export default function AnalysisApp({ authFetch }: AnalysisAppProps) {
                           <option value={365}>1 Year</option>
                         </select>
                       </div>
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>As-Of Date <span style={{ color: '#666', fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
+                      <input
+                        type="date"
+                        value={analysisEndDate}
+                        onChange={(e) => setAnalysisEndDate(e.target.value)}
+                        max={new Date().toISOString().split('T')[0]}
+                        style={{ ...styles.input, color: analysisEndDate ? '#e0e0e0' : '#666' }}
+                        placeholder="Default: today"
+                      />
+                      {analysisEndDate && (
+                        <button
+                          onClick={() => setAnalysisEndDate("")}
+                          style={{ background: 'none', border: 'none', color: '#4fc3f7', cursor: 'pointer', fontSize: 12, padding: '4px 0', textAlign: 'left' }}
+                        >
+                          ✕ Reset to today
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
